@@ -170,6 +170,7 @@ export default function Homepage() {
                 <button
                   className="border border-color1 border-dashed uppercase px-4 py-2 rounded-lg hover:bg-color1 hover:text-white transition-all ease-in-out duration-300"
                   onClick={() => {
+                    if (!user) handleNavigate("/authentication/signin");
                     handleNavigate("/products/all-category/all-products");
                   }}
                 >
@@ -196,9 +197,10 @@ export default function Homepage() {
             >
               <button
                 className="underline text-xl"
-                onClick={() =>
-                  handleNavigate("/products/all-category/all-products")
-                }
+                onClick={() => {
+                  if (!user) handleNavigate("/authentication/signin");
+                  handleNavigate("/products/all-category/all-products");
+                }}
               >
                 browse all products
               </button>
@@ -436,6 +438,8 @@ export default function Homepage() {
                 <button
                   className="border border-color1 border-dashed uppercase px-4 py-2 rounded-lg hover:bg-color1 hover:text-white transition-all ease-in-out duration-300"
                   onClick={() => {
+                    if (user)
+                      handleNavigate("/products/all-category/all-products");
                     handleNavigate("/authentication/register");
                   }}
                 >
