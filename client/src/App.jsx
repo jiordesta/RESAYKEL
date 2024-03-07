@@ -21,8 +21,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" Component={Homepage} />
-          <Route path="/products/:category" Component={Products} />
-          <Route path="/products/:search" Component={Products} />
+          <Route path="/products/:category/:name" Component={Products} />
           <Route path="/dashboard" Component={Dashboard} />
           <Route path="/Authentication/:action" Component={Authentication} />
         </Routes>

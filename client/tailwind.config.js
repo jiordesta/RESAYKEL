@@ -9,6 +9,9 @@ export default {
         color3: "#00ADB5",
         color4: "#EEEEEE",
       },
+      transitionProperty: {
+        height: "height",
+      },
     },
     screens: {
       xm: "430px",
