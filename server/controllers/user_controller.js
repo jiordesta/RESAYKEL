@@ -4,10 +4,11 @@ import { comparePassword, hashPassword } from "../utils/password.js";
 import { BadRequestError } from "../utils/custom_errors.js";
 import { createJWT } from "../utils/token.js";
 import { uploadImage } from "../utils/file_handler.js";
+import { count } from "../utils/CreateCounter.js";
 
 export const signup = async (req, res) => {
   const { name, username, password } = req.body;
-  const url = await uploadImage(req);
+  const url = await uploadImage(req, `resaykel/users/${username}`);
   if (!url) throw new BadRequestError("Error uploading the image");
   const user = await User.create({
     name,
@@ -17,6 +18,7 @@ export const signup = async (req, res) => {
   });
   if (!user)
     throw new BadRequestError("There was an error creating your account");
+  await count("user");
   res.status(StatusCodes.OK).json("");
 };
 

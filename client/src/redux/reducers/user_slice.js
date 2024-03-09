@@ -1,7 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AxiosInstance from "../axios_instance";
 
-const initialState = {};
+const initialState = {
+  user: null,
+  loading_user: false,
+  loading_login: false,
+  loading_logout: false,
+  loading_signin: false,
+  loading_signout: false,
+  loading_signup: false,
+};
 
 export const signin = createAsyncThunk("/signin", async (inputs) => {
   try {
@@ -50,7 +58,51 @@ export const signout = createAsyncThunk("/signout", async () => {
 const userSlice = createSlice({
   name: "auth",
   initialState,
-  extraReducers: (builder) => {},
+  extraReducers: (builder) => {
+    //signup
+    builder.addCase(signup.pending, (state) => {
+      state.loading_signup = true;
+    });
+    builder.addCase(signup.rejected, (state) => {
+      state.loading_signup = false;
+    });
+    builder.addCase(signup.fulfilled, (state) => {
+      state.loading_signup = false;
+    });
+    //signin
+    builder.addCase(signin.pending, (state) => {
+      state.loading_signin = true;
+    });
+    builder.addCase(signin.rejected, (state) => {
+      state.loading_signin = false;
+    });
+    builder.addCase(signin.fulfilled, (state) => {
+      state.loading_signin = false;
+    });
+    //signout
+    builder.addCase(signout.pending, (state) => {
+      state.loading_signout = true;
+    });
+    builder.addCase(signout.rejected, (state) => {
+      state.loading_signout = false;
+    });
+    builder.addCase(signout.fulfilled, (state) => {
+      state.loading_signout = false;
+      state.user = null;
+    });
+    //fetch user
+    builder.addCase(fetch_user.pending, (state) => {
+      state.loading_user = true;
+    });
+    builder.addCase(fetch_user.rejected, (state) => {
+      state.loading_user = false;
+      state.user = null;
+    });
+    builder.addCase(fetch_user.fulfilled, (state, action) => {
+      state.loading_user = false;
+      state.user = action.payload;
+    });
+  },
 });
 
 export default userSlice.reducer;

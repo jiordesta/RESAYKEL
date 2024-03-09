@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { useInView } from "react-intersection-observer";
-export default function AnimationHandler({ children, from, to }) {
+export default function AnimationHandler({ children, from, to, container }) {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -9,7 +9,7 @@ export default function AnimationHandler({ children, from, to }) {
   const animationRef = useRef(null);
 
   return (
-    <div ref={ref} className="animate-on-scroll w-full overflow-hidden">
+    <div ref={ref} className={`animate-on-scroll overflow-hidden ${container}`}>
       <div
         ref={animationRef}
         className={`animation-container ${inView ? to : from}`}

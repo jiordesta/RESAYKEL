@@ -30,92 +30,26 @@
   .bar {
     @apply w-[30px] h-[2px] bg-color1 my-[4px];
   }
-  .nav-menu {
+  .menu {
     @apply hidden;
   }
-  .nav-menu.active {
-    @apply block;
+  .menu.active {
+    @apply flex;
   }
+}
 
-  .appear-right {
-    @apply translate-x-[500px] opacity-0;
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
   }
-  .appear-right.active {
-    @apply translate-x-[0px] transition-all ease-in-out opacity-100;
+  100% {
+    background-position: -200% 0;
   }
+}
 
-  .appear-right-1500 {
-    @apply translate-x-[500px] opacity-100;
-  }
-  .appear-right-1500.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[1500ms] placeholder-opacity-0;
-  }
-  .appear-right-2000 {
-    @apply translate-x-[500px] opacity-100;
-  }
-  .appear-right-2000.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[2000ms] placeholder-opacity-0;
-  }
-  .appear-right-2500 {
-    @apply translate-x-[500px] opacity-100;
-  }
-  .appear-right-2500.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[2500ms] placeholder-opacity-0;
-  }
-  .appear-right-3000 {
-    @apply translate-x-[500px] opacity-100;
-  }
-  .appear-right-3000.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[3000ms] placeholder-opacity-0;
-  }
-
-  .appear-left-1500 {
-    @apply translate-x-[-500px] opacity-100;
-  }
-  .appear-left-1500.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[1500ms] placeholder-opacity-0;
-  }
-  .appear-left-2000 {
-    @apply translate-x-[-500px] opacity-100;
-  }
-  .appear-left-2000.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[2000ms] placeholder-opacity-0;
-  }
-  .appear-left-2500 {
-    @apply translate-x-[-500px] opacity-100;
-  }
-  .appear-left-2500.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[2500ms] placeholder-opacity-0;
-  }
-  .appear-left-3000 {
-    @apply translate-x-[-500px] opacity-100;
-  }
-  .appear-left-3000.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[3000ms] placeholder-opacity-0;
-  }
-
-  .appear-left-1500 {
-    @apply translate-x-[-500px] opacity-100;
-  }
-  .appear-left-1500.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[1500ms] placeholder-opacity-0;
-  }
-  .appear-left-2000 {
-    @apply translate-x-[-500px] opacity-100;
-  }
-  .appear-left-2000.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[2000ms] placeholder-opacity-0;
-  }
-  .appear-left-2500 {
-    @apply translate-x-[-500px] opacity-100;
-  }
-  .appear-left-2500.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[2500ms] placeholder-opacity-0;
-  }
-  .appear-left-3000 {
-    @apply translate-x-[-500px] opacity-100;
-  }
-  .appear-left-3000.active {
-    @apply translate-x-[0px] transition-all ease-in-out duration-[3000ms] placeholder-opacity-0;
-  }
+.skeleton {
+  background: linear-gradient(-90deg, #eee 30%, #f5f5f5 50%, #eee 70%);
+  background-size: 200% 200%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
 }

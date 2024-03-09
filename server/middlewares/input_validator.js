@@ -2,7 +2,6 @@ import { body, validationResult } from "express-validator";
 import { BadRequestError } from "../utils/custom_errors.js";
 
 import User from "../models/User.js";
-import Store from "../models/Store.js";
 import Product from "../models/Product.js";
 
 const withValidationErrors = (validateValues) => {
@@ -36,25 +35,16 @@ export const validate_signin = withValidationErrors([
   body("password").notEmpty().withMessage("Password is Required"), //add custom for security
 ]);
 
-export const validate_create_store = withValidationErrors([
-  body("name")
-    .notEmpty()
-    .withMessage("Name is Required")
-    .custom(async (name) => {
-      const store = await Store.findOne({ name });
-      if (store) throw new BadRequestError(`${name} is already taken`);
-    }),
-  body("desc").notEmpty().withMessage("Description is Required"),
-]);
-
 export const validate_create_product = withValidationErrors([
   body("name")
     .notEmpty()
     .withMessage("Name is Required")
     .custom(async (name) => {
       const product = await Product.findOne({ name });
-      if (product) throw new BadRequestError("Duplicated products detected");
+      if (product)
+        throw new BadRequestError(
+          "The name of the product you are about to create already exist, Try other name!"
+        );
     }),
   body("desc").notEmpty().withMessage("Description is Required"),
-  body("price").notEmpty().withMessage("Price is Required"),
 ]);

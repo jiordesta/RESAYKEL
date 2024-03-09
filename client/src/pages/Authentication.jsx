@@ -1,43 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { signin, signup } from "../redux/reducers/user_slice";
 import Loading from "../components/Loading";
-import { error } from "../redux/reducers/notification_slice";
+import { error, success } from "../redux/reducers/notification_slice";
 
 export default function Authentication() {
   const { action } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
+  const { loading_signin, loading_signup } = useSelector((state) => state.user);
 
   const handleNavigate = (to) => {
     navigate(to);
-  };
-
-  const handleSignin = (inputs) => {
-    setLoading(true);
-    dispatch(signin(inputs)).then((res) => {
-      if (res.error) {
-        dispatch(error(res.error.message));
-      } else {
-        handleNavigate("/");
-      }
-      setLoading(false);
-    });
-  };
-
-  const handleSignup = (inputs) => {
-    setLoading(true);
-    dispatch(signup(inputs)).then((res) => {
-      if (res.error) {
-        dispatch(error(res.error.message));
-      } else {
-        handleNavigate("/authentication/signin");
-      }
-      setLoading(false);
-    });
   };
 
   const Signin = () => {
@@ -45,9 +21,23 @@ export default function Authentication() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const handleSignin = (e) => {
+      e.preventDefault();
+      dispatch(signin({ username, password })).then((res) => {
+        if (res.error) {
+          dispatch(error(res.error.message));
+        } else {
+          handleNavigate("/");
+        }
+      });
+    };
+
     return (
       <div className="h-screen w-full flex justify-center items-center">
-        <div className=" w-full sm:w-[75%] md:w-[50%] lg:w-[40%] rounded-lg md:border border-color1 border-dashed bg-white p-1 space-y-2">
+        <div
+          className=" w-full sm:w-[75%] md:w-[50%] lg:w-[40%] rounded-lg md:border border-color1 border-dashed bg-white p-1 space-y-2"
+          onSubmit={handleSignin}
+        >
           <div className="w-full h-[25%] bg-color1 rounded-md flex justify-center items-center">
             <h1 className="text-4xl uppercase font-bold text-color4">signin</h1>
           </div>
@@ -58,6 +48,7 @@ export default function Authentication() {
             <input
               type="text"
               placeholder="USERNAME"
+              defaultValue={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full py-2 pl-12 pr-2 rounded-md focus:outline-none placeholder:text-color1 focus:bg-black focus:bg-opacity-5"
             />
@@ -81,19 +72,19 @@ export default function Authentication() {
             <input
               type={`${showPassword ? "text" : "password"}`}
               placeholder="PASSWORD"
+              defaultValue={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full py-2 pl-12 pr-12 rounded-md focus:outline-none placeholder:text-color1 focus:bg-black focus:bg-opacity-5"
             />
           </div>
           <button
+            type="submit"
             className={`border border-color1 border-dashed w-full uppercase py-2 rounded-md font-semibold ${
               !username || !password
                 ? "cursor-not-allowed"
                 : "hover:bg-color1 hover:text-white"
             }`}
-            onClick={() => {
-              handleSignin({ username, password });
-            }}
+            onClick={handleSignin}
           >
             signin
           </button>
@@ -122,6 +113,18 @@ export default function Authentication() {
     const [name, setName] = useState("");
     const [image, setImage] = useState(null);
     const [confirm, setConfirm] = useState(false);
+
+    const handleSignup = (e) => {
+      e.preventDefault();
+      dispatch(signup({ name, username, password: pw1, image })).then((res) => {
+        if (res.error) {
+          dispatch(error(res.error.message));
+        } else {
+          handleNavigate("/authentication/signin");
+          dispatch(success("Registered an Account Successfully"));
+        }
+      });
+    };
 
     useEffect(() => {
       if (pw1 === pw2) {
@@ -169,7 +172,10 @@ export default function Authentication() {
 
     return (
       <div className="h-screen w-full flex justify-center items-center">
-        <div className=" w-full sm:w-[75%] md:w-[50%] lg:w-[40%] rounded-lg md:border border-color1 border-dashed bg-white p-1 space-y-2">
+        <div
+          className=" w-full sm:w-[75%] md:w-[50%] lg:w-[40%] rounded-lg md:border border-color1 border-dashed bg-white p-1 space-y-2"
+          onSubmit={handleSignup}
+        >
           <div className="w-full h-[25%] bg-color1 rounded-md flex justify-center items-center">
             <h1 className="text-4xl uppercase font-bold text-color4">signup</h1>
           </div>
@@ -259,14 +265,13 @@ export default function Authentication() {
           </div>
           <FileInput />
           <button
+            type="submit"
             className={`border border-color1 border-dashed w-full uppercase py-2 rounded-md font-semibold ${
               !name || !confirm || !username || !image
                 ? "cursor-not-allowed"
                 : "hover:bg-color1 hover:text-white"
             }`}
-            onClick={() =>
-              handleSignup({ name, username, password: pw1, image })
-            }
+            onClick={handleSignup}
           >
             signup
           </button>
@@ -289,7 +294,9 @@ export default function Authentication() {
   return (
     <div className="px-2 xm:px-4 sm:px-8 md:px-16 lg:px-32 xl:px-64 h-screen">
       {action === "signup" ? <Signup /> : <Signin />}
-      {loading && <Loading w={75} text="Please wait" />}
+      {loading_signin || loading_signup ? (
+        <Loading w={75} text="Please wait" />
+      ) : null}
     </div>
   );
 }
