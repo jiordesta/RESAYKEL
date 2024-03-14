@@ -4,7 +4,7 @@ const ProductSchema = new mongoose.Schema({
   desc: { type: String },
   image: { type: String },
   price: { type: Number, default: 0 },
-  seller: { type: mongoose.Types.ObjectId },
-  category: { type: String, default: "any" },
+  seller: { type: Object },
+  category: { type: Object, default: { label: "Any", value: "any" } },
 });
 export default mongoose.model("Product", ProductSchema);

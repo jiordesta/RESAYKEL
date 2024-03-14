@@ -1,31 +1,74 @@
 import { StatusCodes } from "http-status-codes";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 import { BadRequestError } from "../utils/custom_errors.js";
 import { uploadImage } from "../utils/file_handler.js";
-import { count } from "../utils/CreateCounter.js";
+import { count, list } from "../utils/create.js";
+import List from "../models/List.js";
+import Count from "../models/Counter.js";
 
 export const create_product = async (req, res) => {
   const { name, desc, price, category } = req.body;
-  const url = await uploadImage(req, `resaykel/products/${name}`);
   const { _id } = req.user;
+  const url = await uploadImage(req, `resaykel/products/${name}`);
   if (!url)
     throw new BadRequestError("There was an error in uploading the image");
-  const product = await Product.create({
-    name,
-    desc,
+
+  const user = await User.findById(_id);
+  if (!user) throw new BadRequestError("An error occured creating the product");
+
+  const data = {
+    name: name,
+    desc: desc,
     price,
+    category: {
+      label: category,
+      value: category.toLowerCase().replace(/\s/g, ""),
+    },
     image: url,
-    seller: _id,
-    category,
-  });
+    seller: {
+      _id: user._id,
+      name: user.name,
+      username: user.username,
+    },
+  };
+
+  await list("categories", data.category);
+
+  const product = await Product.create(data);
   if (!product) throw new BadRequestError("Error in creating product");
   await count("product");
-  res.status(StatusCodes.OK).json("");
+  res.status(StatusCodes.OK).json("Created");
 };
 
 export const fetch_products = async (req, res) => {
-  const { offset, limit } = req.params;
-  const products = await Product.find({}); //improve later
+  const { name, category } = req.params;
+
+  const nameFilter = name.toLowerCase().replace(/%20/g, "").replace(/\s+/g, "");
+
+  const fetchData = async () => {
+    const escapedTerm = nameFilter.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const regexPattern = new RegExp(escapedTerm.split("").join("\\s*"), "i");
+    if (name === "all" && category === "all") {
+      return await Product.find({});
+    } else if (name !== "all" && category !== "all") {
+      return await Product.find({
+        name: regexPattern,
+        "category.value": category,
+      });
+    } else if (category === "all") {
+      return await Product.find({ name: regexPattern });
+    } else if (name === "all") {
+      return await Product.find({ "category.value": category });
+    } else {
+      return [];
+    }
+  };
+
+  const products = await fetchData();
+  const categories = await List.findOne({ name: "categories" });
+  const count = await Count.findOne({ name: "product" });
+
   if (!products) throw new BadRequestError("Error in loading the data");
-  res.status(StatusCodes.OK).json({ products });
+  res.status(StatusCodes.OK).json({ products, categories, count });
 };

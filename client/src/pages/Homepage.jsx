@@ -28,7 +28,15 @@ export default function Homepage() {
   };
 
   const handleNavigate = (to) => {
-    navigate(to);
+    if (to === "home") {
+      navigate("/");
+    } else if (to === "signin") {
+      navigate("/authentication/signin");
+    } else if (to === "signup") {
+      navigate("/authentication/signup");
+    } else if (to === "products") {
+      navigate("/products/search/all/all");
+    }
   };
 
   useEffect(() => {
@@ -40,8 +48,9 @@ export default function Homepage() {
   }, [loading_user]);
 
   const Header = () => {
+    const [search, setSearch] = useState("");
     return (
-      <section className="sticky top-0 z-40 text-xl">
+      <section className="sticky top-0 z-40">
         <div className="bg-white border-b border-color1 flex flex-col md:flex-row justify-between py-4">
           <div className="flex justify-between items-center w-full md:w-1/4">
             <AnimationHandler
@@ -50,32 +59,45 @@ export default function Homepage() {
             >
               <div
                 className="w-full cursor-pointer text-xl font-semibold"
-                onClick={() => handleNavigate("/")}
+                onClick={() => handleNavigate("home")}
               >
                 RESAYKEL
               </div>
             </AnimationHandler>
             <AnimationHandler
-              from="translate-x-[-500px] opacity-0"
-              to="translate-x-[0px] transition-all ease-in-out duration-[1000ms] opacity-100"
+              from="translate-y-[-500px] opacity-0"
+              to="translate-y-[0px] transition-all ease-in-out duration-[1000ms] opacity-100"
             >
               <div className="w-full flex justify-end">
                 <Burger target=".menu" />
               </div>
             </AnimationHandler>
           </div>
-          <div className="menu hidden md:flex w-full">
+          <div className="menu hidden md:flex w-full md:w-3/4">
             <div className="w-full flex justify-end pt-4 md:pt-0 flex-col md:flex-row gap-1 md:gap-4">
               <AnimationHandler
-                from="translate-x-[-500px] opacity-0"
-                to="translate-x-[0px] transition-all ease-in-out duration-[1000ms] opacity-100"
+                from="translate-y-[-500px] opacity-0"
+                to="translate-y-[0px] transition-all ease-in-out duration-[1500ms] opacity-100"
                 container="flex items-center"
               >
-                <div className="flex justify-start md:justify-end">
+                <form
+                  className="flex justify-start md:justify-end"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (user) {
+                      navigate(`/products/search/all/${search}`);
+                    } else {
+                      navigate("/authentication/signin");
+                    }
+                  }}
+                >
                   <div className="relative flex">
                     <input
                       type="text"
                       placeholder="Search"
+                      onChange={(e) => {
+                        setSearch(e.target.value);
+                      }}
                       className="pl-10 pr-4 rounded-lg focus:outline-none bg-color1 bg-opacity-5 placeholder:text-color1 py-1 hover:bg-opacity-25 transition-colors ease-in-out duration-500"
                     />
                     <span className="absolute inset-y-0 left-0 pl-2 flex items-center">
@@ -87,13 +109,13 @@ export default function Homepage() {
                       />
                     </span>
                   </div>
-                </div>
+                </form>
               </AnimationHandler>
-              {user ? (
-                <AnimationHandler
-                  from="translate-x-[-500px] opacity-0"
-                  to="translate-x-[0px] transition-all ease-in-out duration-[1500ms] opacity-100"
-                >
+              <AnimationHandler
+                from="translate-y-[-500px] opacity-0"
+                to="translate-y-[0px] transition-all ease-in-out duration-[2000ms] opacity-100"
+              >
+                {user ? (
                   <div
                     className="flex justify-start md:justify-end items-center gap-1"
                     onClick={() => handleSignout()}
@@ -108,16 +130,11 @@ export default function Homepage() {
                     </div>
                     <h1 className="block md:hidden">Signout</h1>
                   </div>
-                </AnimationHandler>
-              ) : (
-                <AnimationHandler
-                  from="translate-x-[-500px] opacity-0"
-                  to="translate-x-[0px] transition-all ease-in-out duration-[1500ms] opacity-100"
-                >
+                ) : (
                   <div className="flex justify-start items-center gap-1">
                     <div
                       className="cursor-pointer flex justify-center items-center p-2 bg-color1 bg-opacity-5 rounded-full hover:bg-opacity-25 transition-all ease-in-out duration-500"
-                      onClick={() => handleNavigate("/authentication/signin")}
+                      onClick={() => handleNavigate("signin")}
                     >
                       <img
                         src="/icons/signin.svg"
@@ -128,8 +145,8 @@ export default function Homepage() {
                     </div>
                     <h1 className="block md:hidden">Signin</h1>
                   </div>
-                </AnimationHandler>
-              )}
+                )}
+              </AnimationHandler>
             </div>
           </div>
         </div>
@@ -173,6 +190,7 @@ export default function Homepage() {
             <AnimationHandler
               from="translate-x-[500px] opacity-0"
               to="translate-x-[0px] transition-all ease-in-out duration-[2500ms] opacity-100"
+              container="w-full"
             >
               <h1 className="text-2xl font-bold text-start w-full">
                 Redefining Sustainable Commerce
@@ -207,9 +225,9 @@ export default function Homepage() {
                   className="border border-color1 border-dashed uppercase px-4 py-2 rounded-lg hover:bg-color1 hover:text-white transition-all ease-in-out duration-300"
                   onClick={() => {
                     if (!user) {
-                      handleNavigate("/authentication/signin");
+                      handleNavigate("signin");
                     } else {
-                      handleNavigate("/products/all-category/all-products");
+                      handleNavigate("products");
                     }
                   }}
                 >
@@ -238,9 +256,9 @@ export default function Homepage() {
                 className="underline text-xl"
                 onClick={() => {
                   if (user) {
-                    handleNavigate("/products/all-category/all-products");
+                    handleNavigate("products");
                   } else {
-                    handleNavigate("/authentication/signin");
+                    handleNavigate("signin");
                   }
                 }}
               >
@@ -482,9 +500,9 @@ export default function Homepage() {
                   className="border border-color1 border-dashed uppercase px-4 py-2 rounded-lg hover:bg-color1 hover:text-white transition-all ease-in-out duration-300"
                   onClick={() => {
                     if (user) {
-                      handleNavigate("/products/all-category/all-products");
+                      handleNavigate("products");
                     } else {
-                      handleNavigate("/authentication/signup");
+                      handleNavigate("signup");
                     }
                   }}
                 >

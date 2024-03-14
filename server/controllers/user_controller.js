@@ -4,7 +4,7 @@ import { comparePassword, hashPassword } from "../utils/password.js";
 import { BadRequestError } from "../utils/custom_errors.js";
 import { createJWT } from "../utils/token.js";
 import { uploadImage } from "../utils/file_handler.js";
-import { count } from "../utils/CreateCounter.js";
+import { count } from "../utils/create.js";
 
 export const signup = async (req, res) => {
   const { name, username, password } = req.body;

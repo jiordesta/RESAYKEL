@@ -19,7 +19,7 @@ router
   );
 
 router
-  .route("/fetch_products/:offset/:limit")
-  .get(authenticate, fetch_products);
+  .route("/fetch_products/:category/:name")
+  .get(upload.single(""), authenticate, fetch_products);
 
 export default router;
