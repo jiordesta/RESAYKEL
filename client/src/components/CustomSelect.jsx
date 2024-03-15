@@ -2,8 +2,17 @@ import React from "react";
 import Creatable from "react-select/creatable";
 import Select from "react-select";
 
-export const CreateSelect = ({ options, style }) => {
-  return <Creatable isClearable options={options} className={`${style}`} />;
+export const CreateSelect = ({ options, style, setCategory }) => {
+  return (
+    <Creatable
+      isClearable
+      options={options}
+      className={`${style}`}
+      onChange={(e) => {
+        setCategory(e?.value);
+      }}
+    />
+  );
 };
 
 export const SelectCategory = ({
@@ -17,7 +26,7 @@ export const SelectCategory = ({
     <Select
       placeholder="Category"
       className={`${style}`}
-      isClearable={true}
+      isClearable={false}
       isSearchable={true}
       options={options}
       value={options.find((cat) => cat.value === category)}

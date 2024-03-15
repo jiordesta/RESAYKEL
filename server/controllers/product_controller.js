@@ -6,6 +6,7 @@ import { uploadImage } from "../utils/file_handler.js";
 import { count, list } from "../utils/create.js";
 import List from "../models/List.js";
 import Count from "../models/Counter.js";
+import { ObjectId } from "mongoose";
 
 export const create_product = async (req, res) => {
   const { name, desc, price, category } = req.body;
@@ -27,7 +28,7 @@ export const create_product = async (req, res) => {
     },
     image: url,
     seller: {
-      _id: user._id,
+      _id,
       name: user.name,
       username: user.username,
     },
@@ -70,5 +71,16 @@ export const fetch_products = async (req, res) => {
   const count = await Count.findOne({ name: "product" });
 
   if (!products) throw new BadRequestError("Error in loading the data");
+  res.status(StatusCodes.OK).json({ products, categories, count });
+};
+
+export const fetch_my_products = async (req, res) => {
+  const { _id } = req.user;
+  const products = await Product.find({ "seller._id": _id });
+
+  if (!products)
+    throw new BadRequestError("There was an error getting the data");
+  const categories = await List.findOne({ name: "categories" });
+  const count = await Count.findOne({ name: "product" });
   res.status(StatusCodes.OK).json({ products, categories, count });
 };

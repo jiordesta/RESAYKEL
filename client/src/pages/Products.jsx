@@ -80,9 +80,14 @@ export default function Products() {
                 }}
               >
                 <div className="hidden md:flex justify-center items-center p-2 bg-color1 bg-opacity-5 rounded-full hover:bg-opacity-25 transition-all ease-in-out duration-500">
-                  <img src="/icons/sell.svg" width={25} height={25} alt="" />
+                  <img
+                    src="/icons/dashboard.svg"
+                    width={25}
+                    height={25}
+                    alt=""
+                  />
                 </div>
-                <h1 className="block md:hidden">Sell</h1>
+                <h1 className="block md:hidden">Dashboard</h1>
               </div>
               <div
                 className="flex justify-start items-center gap-1 cursor-pointer relative"
