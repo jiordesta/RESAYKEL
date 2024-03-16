@@ -6,7 +6,6 @@ import { uploadImage } from "../utils/file_handler.js";
 import { count, list } from "../utils/create.js";
 import List from "../models/List.js";
 import Count from "../models/Counter.js";
-import { ObjectId } from "mongoose";
 
 export const create_product = async (req, res) => {
   const { name, desc, price, category } = req.body;
@@ -83,4 +82,38 @@ export const fetch_my_products = async (req, res) => {
   const categories = await List.findOne({ name: "categories" });
   const count = await Count.findOne({ name: "product" });
   res.status(StatusCodes.OK).json({ products, categories, count });
+};
+
+export const update_product = async (req, res) => {
+  const { id } = req.params;
+  const product = await Product.findByIdAndUpdate(id, req.body);
+  if (!product)
+    throw new BadRequestError("There was an error updating the product");
+  res.status(StatusCodes.OK).json("");
+};
+
+export const update_name = async (req, res) => {
+  const { id } = req.params;
+  const product = await Product.findByIdAndUpdate(id, req.body);
+  if (!product)
+    throw new BadRequestError("There was an error updating the product");
+  res.status(StatusCodes.OK).json("");
+};
+
+export const update_description = async (req, res) => {
+  const { id } = req.params;
+  const product = await Product.findByIdAndUpdate(id, req.body);
+  if (!product)
+    throw new BadRequestError("There was an error updating the product");
+  res.status(StatusCodes.OK).json("");
+};
+
+export const delete_product = async (req, res) => {
+  const { id } = req.params;
+  const { _id } = req.user;
+  const product = await Product.findOne({ "seller._id": _id, _id: id });
+  if (!product)
+    throw new BadRequestError("There was an error deleting the product");
+  await Product.findByIdAndDelete(id);
+  res.status(StatusCodes.OK).json("");
 };

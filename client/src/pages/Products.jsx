@@ -138,7 +138,7 @@ export default function Products() {
     );
   };
 
-  const Product = ({ name, desc, image }) => {
+  const Product = ({ name, desc, image, seller }) => {
     const [expand, setExpand] = useState(false);
     const [imgLoaded, setImgLoaded] = useState(false);
     return (
@@ -186,9 +186,18 @@ export default function Products() {
           <p className="p-1">{desc}</p>
         </div>
         <div className="p-1 h-[15%] flex justify-center items-center w-full">
-          <button className="w-full h-full rounded-lg border border-color1 border-dashed hover:bg-color1 hover:text-white transition-all ease-in-out duration-300">
-            add to cart
-          </button>
+          {user._id === seller._id ? (
+            <button
+              className="w-full h-full rounded-lg border border-color1 border-dashed hover:bg-color1 hover:text-white transition-all ease-in-out duration-300"
+              onClick={() => navigate("/dashboard/manage")}
+            >
+              Manage product
+            </button>
+          ) : (
+            <button className="w-full h-full rounded-lg border border-color1 border-dashed hover:bg-color1 hover:text-white transition-all ease-in-out duration-300">
+              add to cart
+            </button>
+          )}
         </div>
       </div>
     );
@@ -198,7 +207,7 @@ export default function Products() {
     const [filterName, setFilterName] = useState(name);
 
     return (
-      <section className="pt-4 space-y-4 relative">
+      <section className="py-4 space-y-4 relative">
         <div className="flex flex-col md:flex-row gap-4">
           <SelectCategory
             options={categories}
@@ -233,7 +242,7 @@ export default function Products() {
           </form>
         </div>
         <>
-          {loading_products || loading_user ? (
+          {loading_products || loading_user || !user ? (
             <ul className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
               <ProductsSkeleton />
             </ul>

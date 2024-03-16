@@ -1,6 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AxiosInstance from "../axios_instance";
 
+class BadRequestError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "BadRequestError";
+    this.statusCode = 400;
+  }
+}
+
 const initialState = {
   products: [],
   categories: [],
@@ -45,6 +53,57 @@ export const fetch_my_products = createAsyncThunk(
     try {
       const res = await AxiosInstance.get("/product/fetch_my_products");
       return res.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+
+export const delete_product = createAsyncThunk(
+  "/delete_product",
+  async (id) => {
+    try {
+      const res = await AxiosInstance.delete(`/product/delete_product/${id}`);
+      res.data;
+    } catch (error) {
+      throw new Error(error.response.data.message);
+    }
+  }
+);
+
+export const update_product = createAsyncThunk(
+  "/update_product",
+  async (inputs) => {
+    if (!inputs.name && !inputs.desc) {
+      throw new Error("Input fields should not be empty");
+    }
+    try {
+      const data = new FormData();
+
+      if (inputs.name && inputs.desc) {
+        for (const [key, value] of Object.entries(inputs)) {
+          data.append(key, value);
+        }
+        const res = await AxiosInstance.patch(
+          `/product/update_product/${inputs._id}`,
+          data
+        );
+        return res.data.product;
+      } else if (inputs.name) {
+        data.append("name", inputs.name);
+        const res = await AxiosInstance.patch(
+          `/product/update_product/name/${inputs._id}`,
+          data
+        );
+        return res.data.product;
+      } else if (inputs.desc) {
+        data.append("desc", inputs.desc);
+        const res = await AxiosInstance.patch(
+          `/product/update_product/description/${inputs._id}`,
+          data
+        );
+        return res.data.product;
+      }
     } catch (error) {
       throw new Error(error.response.data.message);
     }

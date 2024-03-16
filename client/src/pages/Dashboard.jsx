@@ -6,9 +6,11 @@ import Burger from "../components/Burger";
 import { useNavigate } from "react-router-dom";
 import {
   create_product,
+  delete_product,
   fetch_my_products,
+  update_product,
 } from "../redux/reducers/product_slice";
-import { fetch_user } from "../redux/reducers/user_slice";
+import { fetch_user, signout } from "../redux/reducers/user_slice";
 import Loading from "../components/Loading";
 import ProductsSkeleton from "../components/ProductsSkeleton";
 import { CreateSelect } from "../components/CustomSelect";
@@ -19,7 +21,9 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const [createProduct, setCreateProduct] = useState(false);
-  const { user, loading_user } = useSelector((state) => state.user);
+  const { user, loading_user, loading_signout } = useSelector(
+    (state) => state.user
+  );
   const { products, loading_products, categories } = useSelector(
     (state) => state.product
   );
@@ -59,7 +63,7 @@ export default function Dashboard() {
         dispatch(fetch_my_products());
       }
     });
-  }, [loading_create]);
+  }, [loading_create, loading_signout]);
 
   const Header = () => {
     return (
@@ -96,21 +100,28 @@ export default function Dashboard() {
     );
   };
 
-  const Product = ({ name, desc, image }) => {
+  const Product = (product) => {
+    const [updating, setUpdating] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [update, setUpdate] = useState(false);
     const [expand, setExpand] = useState(false);
     const [imgLoaded, setImgLoaded] = useState(false);
+
+    const [name, setName] = useState(product.name);
+    const [desc, setDesc] = useState(product.desc);
+
     return (
       <div
-        className={`w-full h-[325px] md:h-[300px] lg:h-[275px] xl:h-[250px] bg-white drop-shadow-md rounded-lg overflow-hidden ${
+        className={`relative w-full h-[325px] md:h-[300px] lg:h-[275px] xl:h-[250px] bg-white drop-shadow-md rounded-lg overflow-hidden ${
           imgLoaded ? "cursor-pointer" : ""
         }`}
         onMouseEnter={() => {
-          if (imgLoaded) {
+          if (imgLoaded && !update) {
             setExpand(true);
           }
         }}
         onMouseLeave={() => {
-          if (imgLoaded) {
+          if (imgLoaded && !update) {
             setExpand(false);
           }
         }}
@@ -121,7 +132,7 @@ export default function Dashboard() {
           } transition-height ease-in-out duration-500 relative`}
         >
           <img
-            src={`${imgLoaded ? image : "/icons/img-loader.svg"}`}
+            src={`${imgLoaded ? product.image : "/icons/img-loader.svg"}`}
             style={{
               width: "100%",
               height: "100%",
@@ -140,17 +151,110 @@ export default function Dashboard() {
           </div>
         </div>
         <div className={`w-full h-[75%] p-1 overflow-hidden`}>
-          <h1 className="uppercase text-xl font-bold p-1">{name}</h1>
-          <p className="p-1">{desc}</p>
+          <textarea
+            rows={2}
+            className={`${
+              update
+                ? "bg-black bg-opacity-10 focus:bg-opacity-5"
+                : "bg-transparent uppercase text-xl font-bold"
+            } placeholder:text-color1 focus:outline-none p-1 w-full`}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={!update}
+          />
+          <textarea
+            rows={5}
+            className={`${
+              update
+                ? "bg-black bg-opacity-10 focus:bg-opacity-5"
+                : "bg-transparent"
+            } placeholder:text-color1 focus:outline-none p-1 w-full`}
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+            disabled={!update}
+          />
         </div>
-        <div className="p-1 h-[15%] flex justify-center items-center w-full gap-1">
-          <button className="w-full h-full rounded-lg border border-color1 border-dashed hover:bg-color1 hover:text-white transition-all ease-in-out duration-300">
-            update
-          </button>
-          <button className="w-full h-full rounded-lg border border-color1 border-dashed hover:bg-color1 hover:text-white transition-all ease-in-out duration-300">
-            delete
-          </button>
-        </div>
+        {update ? (
+          <div className="p-1 h-[15%] flex justify-center items-center w-full gap-1">
+            <button
+              className="w-full h-full rounded-lg border border-color1 border-dashed hover:bg-color1 hover:text-white transition-all ease-in-out duration-300"
+              onClick={() => {
+                const inputs = {};
+                if (
+                  name.replace(/\s/g, "") !== product.name.replace(/\s/g, "") &&
+                  name.replace(/\s/g, "") !== ""
+                ) {
+                  inputs["name"] = name;
+                }
+                if (
+                  desc.replace(/\s/g, "") !== product.desc.replace(/\s/g, "") &&
+                  desc.replace(/\s/g, "") !== ""
+                ) {
+                  inputs["desc"] = desc;
+                }
+                inputs["_id"] = product._id;
+
+                if (
+                  name.replace(/\s/g, "") === product.name.replace(/\s/g, "") &&
+                  desc.replace(/\s/g, "") === product.desc.replace(/\s/g, "")
+                ) {
+                  dispatch(error("No changes"));
+                } else {
+                  setUpdating(true);
+                  dispatch(update_product(inputs)).then((res) => {
+                    if (res.error) {
+                      dispatch(error(res.error.message));
+                    } else {
+                      dispatch(success("Updated"));
+                      setUpdate(false);
+                    }
+                    setUpdating(false);
+                  });
+                }
+              }}
+            >
+              Update
+            </button>
+            <button
+              className="w-full h-full rounded-lg border border-color1 border-dashed hover:bg-color1 hover:text-white transition-all ease-in-out duration-300"
+              onClick={() => {
+                setName(product.name);
+                setDesc(product.desc);
+                setUpdate(false);
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <div className="p-1 h-[15%] flex justify-center items-center w-full gap-1">
+            <button
+              className="w-full h-full rounded-lg border border-color1 border-dashed hover:bg-color1 hover:text-white transition-all ease-in-out duration-300"
+              onClick={() => setUpdate(true)}
+            >
+              Enable update
+            </button>
+            <button
+              className="w-full h-full rounded-lg border border-color1 border-dashed hover:bg-color1 hover:text-white transition-all ease-in-out duration-300"
+              onClick={() => {
+                setDeleting(true);
+                dispatch(delete_product(product._id)).then((res) => {
+                  if (res.error) {
+                    dispatch(error(res.error.message));
+                  } else {
+                    dispatch(success("Deleted"));
+                    dispatch(fetch_my_products());
+                  }
+                  setDeleting(false);
+                });
+              }}
+            >
+              delete
+            </button>
+          </div>
+        )}
+        {updating && <Loading w={35} h={35} text="Updating" />}
+        {deleting && <Loading w={35} h={35} text="Deleting" />}
       </div>
     );
   };

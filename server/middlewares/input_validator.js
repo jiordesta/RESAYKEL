@@ -3,6 +3,7 @@ import { BadRequestError } from "../utils/custom_errors.js";
 
 import User from "../models/User.js";
 import Product from "../models/Product.js";
+import e from "express";
 
 const withValidationErrors = (validateValues) => {
   return [
@@ -46,5 +47,22 @@ export const validate_create_product = withValidationErrors([
           "The name of the product you are about to create already exist, Try other name!"
         );
     }),
+  body("desc").notEmpty().withMessage("Description is Required"),
+]);
+
+export const validate_update_product_name = withValidationErrors([
+  body("name")
+    .notEmpty()
+    .withMessage("Name is Required")
+    .custom(async (name) => {
+      const product = await Product.findOne({ name });
+      if (product)
+        throw new BadRequestError(
+          "The name of the product you are about to create already exist, Try other name!"
+        );
+    }),
+]);
+
+export const validate_update_product_description = withValidationErrors([
   body("desc").notEmpty().withMessage("Description is Required"),
 ]);
